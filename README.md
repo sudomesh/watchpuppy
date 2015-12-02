@@ -3,7 +3,7 @@ WORK IN PROGRESS. NOTHING WORKS YET.
 
 This is a utility to activate, configure and deactivate hardware watchdogs on e.g. ar91xx chipsets. This only works on watchdogs supporting the ["Magic Close" feature](https://www.kernel.org/doc/Documentation/watchdog/watchdog-api.txt)
 
-Instead of having the entire watchdog daemon written in C (making it less flexible) this utility let's you write your watchdog daemon as e.g. a shell or lua script and then simply call the watchpuppy at the biginning of the script to initialize the watchdog.
+Instead of having the entire watchdog daemon written in C (making it less flexible) this utility let's you write your watchdog daemon as e.g. a shell or lua script and then simply call the watchpuppy at the beginning of the script to initialize the watchdog.
 
 # Usage
 
