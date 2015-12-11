@@ -13,7 +13,7 @@ const char patchar = 'p'; // can be anything but the stop char
 
 void usage(char* name, FILE *out) {
   fprintf(out, "\n");
-  fprintf(out, "%s [start|stop|status|pat]\n", name);
+  fprintf(out, "%s [start|stop|pat]\n", name);
   fprintf(out, "    -d device : Device file to open (default: /dev/watchdog)\n");
   fprintf(out, "    -t timeout: Reboot after this many seconds with no pat (default: 30)\n");
   fprintf(out, "    -b        : Report whether last reboot was triggered by watchdog, then exit.\n");
@@ -47,7 +47,7 @@ int stop(int fd, int doMagicClose) {
   return 0;
 }
 
-int report_bootstatus() {
+int reportBootstatus() {
   struct watchdog_info info;
   int ret;
   int fd;
@@ -107,7 +107,19 @@ int check_support(int fd, int setTimeout) {
 }
 
 int setTimeout(int fd, int timeout) {
-  printf("NOT IMPLEMENTED\n");
+  int ret;
+
+  if(timeout <=0) {
+    fprintf(stderr, "Timeout must be more than 0\n");
+    return -1;
+  }
+
+  ret = ioctl(fd, WDIOC_SETTIMEOUT, &timeout);
+  if(ret != 0) {
+    fprintf(stderr, "Setting timeout failed\n");
+    return -1;
+  }
+  
   return -1;
 }
 
@@ -125,7 +137,7 @@ int main(int argc, char** argv) {
   while((c = getopt(argc, argv, "bd:t:")) != -1) {
     switch(c) {
     case 'b':
-      ret = report_bootstatus();
+      ret = reportBootstatus();
       if(ret < 0) {
         return 1;
       }
@@ -201,8 +213,6 @@ int main(int argc, char** argv) {
       return 1;
     }
     return 0;  
-  } else if(strcmp(cmd, "status") == 0) {
-    printf("NOT IMPLEMENTED\n");    
   } else if(strcmp(cmd, "pat") == 0) {
     pat(fd);    
   } else {
