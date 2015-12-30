@@ -1,0 +1,32 @@
+#!/bin/sh
+
+# Tweak these paths based on actual paths for your version of OpenWRT
+
+BUILD_BASE=/home/juul/data/build/sudowrt-firmware/built_firmware/builder.ar71xx
+TOOLCHAIN_DIR=${BUILD_BASE}/staging_dir/toolchain-mips_34kc_gcc-4.8-linaro_uClibc-0.9.33.2
+
+export STAGING_DIR=${BUILD_BASE}/staging_dir/target-mips_34kc_uClibc-0.9.33.2
+
+export CFLAGS="-I${TOOLCHAIN_DIR}/linux-3.3.8/include -I${STAGING_DIR}/usr/include -Os -L${STAGING_DIR}/lib -L${STAGING_DIR}/usr/lib -pipe -mno-branch-likely -mips32r2 -mtune=34kc -fno-caller-saves -fhonour-copts"
+
+export PATH=${TOOLCHAIN_DIR}/bin:$PATH
+export TARGETMACH=mips-openwrt-linux-uclibc
+export BUILDMACH=x86_64-pc-linux-gnu
+export ARCH="mips"
+export CROSS=mips-openwrt-linux
+export CC=${CROSS}-gcc
+export GCC=${CROSS}-gcc
+export LD=${CROSS}-ld
+export AS=${CROSS}-as
+export CXX=${CROSS}-g++
+export NM=${CROSS}-nm
+export RANLIB=${CROSS}-ranlib
+export STRIP=${CROSS}-strip
+export OBJCOPY=${CROSS}-objcopy
+export OBJDUMP=${CROSS}-objdump
+
+# These are the actual CFLAGS and CXXFLAGS used by OpenWRT but they aren't really needed for a working executable and contain even more paths that are likely to change between OpenWRT versions
+
+# export CFLAGS"-Os -pipe -mno-branch-likely -mips32r2 -mtune=34kc -fno-caller-saves -fhonour-copts -Wno-error=unused-but-set-variable -msoft-float -mips16 -minterlink-mips16  -I${BUILD_BASE}/staging_dir/target-mips_34kc_uClibc-0.9.33.2/usr/include -I${BUILD_BASE}/staging_dir/target-mips_34kc_uClibc-0.9.33.2/include -I${BUILD_BASE}/staging_dir/toolchain-mips_34kc_gcc-4.8-linaro_uClibc-0.9.33.2/usr/include -I${BUILD_BASE}/staging_dir/toolchain-mips_34kc_gcc-4.8-linaro_uClibc-0.9.33.2/include " 
+
+# CXXFLAGS="-Os -pipe -mno-branch-likely -mips32r2 -mtune=34kc -fno-caller-saves -fhonour-copts -Wno-error=unused-but-set-variable -msoft-float -mips16 -minterlink-mips16  -I${BUILD_BASE}/staging_dir/target-mips_34kc_uClibc-0.9.33.2/usr/include -I${BUILD_BASE}/staging_dir/target-mips_34kc_uClibc-0.9.33.2/include -I${BUILD_BASE}/staging_dir/toolchain-mips_34kc_gcc-4.8-linaro_uClibc-0.9.33.2/usr/include -I${BUILD_BASE}/staging_dir/toolchain-mips_34kc_gcc-4.8-linaro_uClibc-0.9.33.2/include " LDFLAGS="-L${BUILD_BASE}/staging_dir/target-mips_34kc_uClibc-0.9.33.2/usr/lib -L${BUILD_BASE}/staging_dir/target-mips_34kc_uClibc-0.9.33.2/lib -L${BUILD_BASE}/staging_dir/toolchain-mips_34kc_gcc-4.8-linaro_uClibc-0.9.33.2/usr/lib -L${BUILD_BASE}/staging_dir/toolchain-mips_34kc_gcc-4.8-linaro_uClibc-0.9.33.2/lib "

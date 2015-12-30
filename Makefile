@@ -2,4 +2,7 @@
 
 
 all: main.c
-	gcc -o watchpuppy main.c
+	$(CC) -o watchpuppy main.c
+
+cross: main.c
+	$(CC) -o watchpuppy main.c $(CFLAGS) $(LDFLAGS)
