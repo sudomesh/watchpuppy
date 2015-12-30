@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+#include <errno.h>
 
 const char stopchar = 'V';
 const char patchar = 'p'; // can be anything but the stop char
@@ -55,7 +56,7 @@ int reportBootstatus() {
   
   ret = ioctl(fd, WDIOC_GETSUPPORT, &info);
   if(ret != 0) {
-    fprintf(stderr, "Checking which features are supported by watchdog failed.\n");
+    fprintf(stderr, "Checking which features are supported by watchdog failed: %s\n", strerror(errno));
     return -1;
   }
 
@@ -66,7 +67,7 @@ int reportBootstatus() {
   
   ret = ioctl(fd, WDIOC_GETBOOTSTATUS, &boot_status);
   if(ret != 0) {
-    fprintf(stderr, "Getting boot status failed.\n");
+    fprintf(stderr, "Getting boot status failed: %s\n", strerror(errno));
     return -1;
   }  
   
@@ -83,7 +84,7 @@ int check_support(int fd, int setTimeout) {
   
   ret = ioctl(fd, WDIOC_GETSUPPORT, &info);
   if(ret != 0) {
-    fprintf(stderr, "Checking which features are supported by watchdog failed.\n");
+    fprintf(stderr, "Checking which features are supported by watchdog failed: %s\n", strerror(errno));
     return -1;
   }
   if(!(info.options & WDIOF_MAGICCLOSE)) {
@@ -95,7 +96,7 @@ int check_support(int fd, int setTimeout) {
     
     ret = ioctl(fd, WDIOC_GETTIMEOUT, &timeout);
     if(ret != 0) {
-      fprintf(stderr, "Could neither get nor set watchdog timeout.\n");
+      fprintf(stderr, "Could neither get nor set watchdog timeout: %s\n", strerror(errno));
       return -1;
     }
     if(setTimeout != timeout) {
