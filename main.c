@@ -31,6 +31,7 @@ int pat(int fd) {
 }
 
 int stop(int fd, int doMagicClose) {
+  
   int ret;
   if(doMagicClose) {
     ret = write(fd, &stopchar, 1);
@@ -48,10 +49,9 @@ int stop(int fd, int doMagicClose) {
   return 0;
 }
 
-int reportBootstatus() {
+int reportBootstatus(int fd) {
   struct watchdog_info info;
   int ret;
-  int fd;
   int boot_status;
   
   ret = ioctl(fd, WDIOC_GETSUPPORT, &info);
@@ -129,25 +129,17 @@ int main(int argc, char** argv) {
   int c;
   int ret;
   int magicClose;
-  char defaultDevPath[] = "/etc/watchdog";
+  char defaultDevPath[] = "/dev/watchdog";
   char* devPath = NULL;
   char* timeoutStr = NULL;
   int timeout = 30; // default timeout
   char* cmd = NULL;
+  int checkBootStatus = 0;
   
   while((c = getopt(argc, argv, "bd:t:")) != -1) {
     switch(c) {
     case 'b':
-      ret = reportBootstatus();
-      if(ret < 0) {
-        return 1;
-      }
-      if(ret == 1) {
-        printf("Last reboot triggered by watchdog: no\n");
-      } else {
-        printf("Last reboot triggered by watchdog: yes.\n");
-      }
-      return 0;
+      checkBootStatus = 1;
       break;
     case 'd':
       devPath = optarg;
@@ -166,7 +158,7 @@ int main(int argc, char** argv) {
     cmd = argv[optind];
   }
   
-  if(!cmd) {
+  if(!cmd && !checkBootStatus) {
     usage(argv[0], stderr);
     return 1;
   }
@@ -175,7 +167,7 @@ int main(int argc, char** argv) {
     devPath = defaultDevPath;
   }
   
-  if(timeoutStr) {
+  if(cmd && timeoutStr) {
     timeout = atoi(timeoutStr);
     if((timeout < 1) || (timeout > 86400)) {
       fprintf(stderr, "Timeout must be between 1 and 86400\n");
@@ -188,6 +180,19 @@ int main(int argc, char** argv) {
   if(fd < 0) {
     fprintf(stderr, "Could not open device %s\n", devPath);
     return 1;
+  }
+
+  if(checkBootStatus) {
+    ret = reportBootstatus(fd);
+    if(ret < 0) {
+      return 1;
+    }
+    if(ret == 1) {
+      printf("Last reboot triggered by watchdog: yes\n");
+    } else {
+      printf("Last reboot triggered by watchdog: no.\n");
+    }
+    return 0;
   }
   
   ret = check_support(fd, timeout);
